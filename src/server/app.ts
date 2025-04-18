@@ -12,6 +12,11 @@ const app:Application = express();
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 
+// Basic health check route
+app.get('/health', (req: Request, res: Response) => {
+    res.status(200).json({ status: 'ok' });
+});
+
 // API key authentication middleware
 app.use((req:Request, res:Response , next:NextFunction) => {
     const apiKey = req.headers["x-api-key"];
@@ -26,7 +31,7 @@ app.use((req:Request, res:Response , next:NextFunction) => {
 });
 
 // Mount version 1 routes
-// v1(app);
+v1(app);
 
 // Handle unknown routes
 app.use("*" , (req:Request, res:Response , next:NextFunction)=> {
