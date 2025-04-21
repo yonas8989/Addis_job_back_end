@@ -83,6 +83,19 @@ export class UserDal {
     }
   }
 
+  static async verifyUser(id: string): Promise<IUserDocument | null> {
+    try {
+      const user = await UserModel.findByIdAndUpdate(
+        id,
+        { isVerified: true, otp: null, otpExpiresIn: null },
+        { runValidators: true, new: true }
+      );
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   /**
    * Updates the email/phone number change status for a user
    * @param id - MongoDB document ID of the user
