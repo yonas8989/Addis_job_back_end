@@ -9,6 +9,7 @@ import { generate_token } from "../../../../utils/token";
 import { deviceInfo } from "../../../../utils/deviceInfo";
 import { deviceIdGenerator } from "../../../../utils/deviceIdGenerator";
 
+
 // create user
 export const createUser: RequestHandler = async (req, res, next) => {
   try {
@@ -79,8 +80,7 @@ const verifyOtp: RequestHandler = async (req, res, next) => {
       return next(new AppError("User does not exists.", 404));
     }
 
-    res.status(200),
-      json({
+    res.status(200).json({
         status: "SUCCESS",
         message: "You have sucessfully verfied your account",
         data: {

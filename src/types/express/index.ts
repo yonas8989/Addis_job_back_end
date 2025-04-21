@@ -2,7 +2,9 @@ export {}
 declare global {
     namespace Express {
         interface Request{
-            user:object
+            admin:object,
+            user: object;
+            value: object;
         }
     }
 }
