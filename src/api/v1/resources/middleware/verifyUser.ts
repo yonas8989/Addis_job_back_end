@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { IUserDocument } from "../user/schema";
 import AppError from "../../../../utils/app_error";
 
-export const verfyUser: RequestHandler = async (req, res, next) => {
+export const verifyUser: RequestHandler = async (req, res, next) => {
   try {
     const user = <IUserDocument>req.value;
     const userId = req.params.userId;

@@ -1,5 +1,7 @@
 import { validator } from "./validator";
+import { protect } from "./protect";
 import { auth } from "./auth";
+import { verifyUser } from "./verifyUser";
 
 
-export {validator, auth};
+export { validator, protect, auth, verifyUser };
