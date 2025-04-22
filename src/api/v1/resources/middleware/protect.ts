@@ -15,9 +15,9 @@ export const protect: RequestHandler = async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
     }
     if (!token) {
-      next(new AppError("User does not exists.", 404));
+      return next(new AppError("User does not exists.", 404));
     }
-    const decryptData = verifyToken(token);
+    const decryptData = verifyToken(token as string);
 
     if (decryptData.role === "user") {
       const user = await UserDal.getUser(decryptData.id);

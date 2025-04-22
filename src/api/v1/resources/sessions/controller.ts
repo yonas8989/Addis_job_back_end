@@ -74,7 +74,7 @@ export const destroySession: RequestHandler = async (req, res, next) => {
       return next(new AppError("Session does not exists.", 404));
 
     if (sessionData.isOwner) {
-      const userSessions = await SessionsDal.getUserSessions(sessionData.user);
+      const userSessions = await SessionsDal.getUserSessions(sessionData.user.toString());
       if (userSessions.length > 1)
         return next(
           new AppError(
@@ -128,7 +128,7 @@ export const deleteSession: RequestHandler = async (req, res, next) => {
       return next(new AppError("Session does not exists.", 404));
 
     if (sessionData.isOwner) {
-      const userSessions = await SessionsDal.getUserSessions(sessionData.user);
+      const userSessions = await SessionsDal.getUserSessions(sessionData.user.toString());
       if (userSessions.length > 1)
         return next(
           new AppError(
