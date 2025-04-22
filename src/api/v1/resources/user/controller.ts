@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { ICreateUser, IUserLogin, IVerifyOtp } from "./dto";
-import { hashPayload } from "../../../../utils/hasPayload";
+import { hashPayload } from "../../../../utils/hashpayload";
 import { generateOtp } from "../../../../utils/generateOtp";
 import { UserDal } from "./dal";
 import { compareSync } from "bcryptjs";
