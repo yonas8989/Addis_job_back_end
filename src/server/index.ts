@@ -1,28 +1,30 @@
-// Import required modules
 import { createServer } from "http";
 import app from "./app";
 import db from "./db";
-
-// Default export function that sets up and starts the server
+import { generateToken, verifyToken } from "../utils/token";
+/**
+ * Server
+ * @param {}
+ * @returns {}
+ */
 export default () => {
-    // Set port from environment variable or default to 3000
-    const port = (process.env.PORT as unknown as number) || 3000;
+  const port = (process.env.PORT as unknown as number) || 3000;
 
-    // Create HTTP server using the Express app
-    const server = createServer(app);
+  const server = createServer(app);
 
-    // Start listening on the specified port
-    server.listen(port, () => {
-        console.log(`Listening on ${port}...`);
-    })
+  server.listen(port, () => {
+    console.log(`Listening on ${port}...`);
+  });
 
-    // Initialize MongoDB connection
-    const mongo = db.mongo();
+  const mongo = db.mongo();
 
-    // Handle graceful shutdown on SIGINT (Ctrl+C)
-    process.on("SIGINT", () => {
-        server.close(() => {
-            console.log("Server is Closing")
-        });
+  // console.log(app._router.stack[5].handle.stack);
+
+  // Majestic close
+  process.on("SIGINT", () => {
+    // mongo.close();
+    server.close(() => {
+      console.log("Server is closing");
     });
-}
+  });
+};

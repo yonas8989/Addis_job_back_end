@@ -43,7 +43,7 @@ export const createUserValidation = Joi.object({
 export const userLoginValidation = Joi.object({
   emailOrPhoneNumber: Joi.alternatives()
     .try(
-     Joi.string().email().required().messages({
+      Joi.string().email().required().messages({
         "string.base": "Email should be a string",
         "string.empty": "Email can not be empty",
         "string.email": "Email must be a valid email",

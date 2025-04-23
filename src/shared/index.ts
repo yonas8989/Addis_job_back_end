@@ -1,3 +1,3 @@
 import { Role } from "./role";
 
-export {Role};
+export { Role };

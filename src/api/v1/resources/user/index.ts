@@ -9,7 +9,6 @@ import {
   verifyOtpValidation,
 } from "./validations";
 
-
 import {
   createUser,
   userLogin,

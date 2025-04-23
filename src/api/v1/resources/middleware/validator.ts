@@ -13,7 +13,7 @@ export const validator = (validationSchema: Schema): RequestHandler => {
 
     if (error) return next(new AppError(error.message, 400));
 
-   req.value = value;
+    req.value = value;
 
     next();
   };

@@ -1,35 +1,29 @@
 import { RequestHandler } from "express";
 import { ICreateUser, IUserLogin, IVerifyOtp } from "./dto";
-import { hashPayload } from "../../../../utils/hashpayload";
+import { hashPayload } from "../../../../utils/hashPayload";
 import { generateOtp } from "../../../../utils/generateOtp";
 import { UserDal } from "./dal";
 import { compareSync } from "bcryptjs";
 import AppError from "../../../../utils/app_error";
 import { generateToken } from "../../../../utils/token";
+import { SessionsDal } from "../sessions/dal";
 import { deviceInfo } from "../../../../utils/deviceInfo";
 import { deviceIdGenerator } from "../../../../utils/deviceIdGenerator";
 
-/**
- * Create a new user account
- * This function handles user registration by:
- * 1. Hashing the password
- * 2. Generating an OTP for verification
- * 3. Creating the user in the database
- * 4. Sending the OTP to the user
- */
+// Create user
 export const createUser: RequestHandler = async (req, res, next) => {
   try {
     const data = <ICreateUser>req.value;
 
-    // Hash password for secure storage
+    // Hash password
     const password = hashPayload(data.password);
 
-    // Generate OTP for account verification
+    // Generate OTP
     const otp = generateOtp();
     const hashedOtp = hashPayload(otp);
-    const otpExpiresIn = new Date(Date.now() + 1 * 60 * 1000); // OTP expires in 1 minute
+    const otpExpiresIn = new Date(Date.now() + 1 * 60 * 1000);
 
-    // Create user in database
+    // Create user
     const user = await UserDal.createUser({
       firstName: data.firstName,
       lastName: data.lastName,
@@ -40,7 +34,7 @@ export const createUser: RequestHandler = async (req, res, next) => {
       otpExpiresIn,
     });
 
-    // Send OTP to user (currently logged to console)
+    // Send OTP
     console.log(otp);
 
     res.status(200).json({
@@ -56,48 +50,34 @@ export const createUser: RequestHandler = async (req, res, next) => {
   }
 };
 
-/**
- * Verify user account using OTP
- * This function:
- * 1. Validates the OTP
- * 2. Checks if OTP is expired
- * 3. Marks the user as verified if OTP is valid
- */
+// Verify OTP
 export const verifyOtp: RequestHandler = async (req, res, next) => {
   try {
     const data = <IVerifyOtp>req.value;
 
     const userData = await UserDal.getUser(req.params.userId);
-    if (!userData) {
-      return next(new AppError("User does not exists.", 404));
-    }
+    if (!userData) return next(new AppError("User does not exists.", 404));
 
-    // Validate OTP
-    if (!userData.otp || !userData.otpExpiresIn) {
+    // Compare otp
+    if (!userData.otp || !userData.otpExpiresIn)
       return next(
-        new AppError("OTP can not be found. please request again. ", 400)
+        new AppError("OTP can not be found. Please request again.", 400)
       );
-    }
-    if (!compareSync(data.otp, userData.otp)) {
-      return next(new AppError("Invalid OTP", 400));
-    }
 
-    // Check if OTP is expired
+    if (!compareSync(data.otp, userData.otp))
+      return next(new AppError("Invalid OTP.", 400));
+
     const otpExpiresIn = userData.otpExpiresIn.getTime();
     const currentDate = new Date().getTime();
-    if (otpExpiresIn < currentDate) {
-      return next(new AppError("Otp has expired. pelase request again.", 400));
-    }
+    if (otpExpiresIn < currentDate)
+      return next(new AppError("OTP has expired. Please request again.", 400));
 
-    // Mark user as verified
     const user = await UserDal.verifyUser(userData.id);
-    if (!user) {
-      return next(new AppError("User does not exists.", 404));
-    }
+    if (!user) return next(new AppError("User does not exists.", 404));
 
     res.status(200).json({
       status: "SUCCESS",
-      message: "You have sucessfully verfied your account",
+      message: "You have successfully verified your account.",
       data: {
         user,
       },
@@ -107,13 +87,74 @@ export const verifyOtp: RequestHandler = async (req, res, next) => {
   }
 };
 
-/**
- * Request a new OTP for account verification
- * This function:
- * 1. Generates a new OTP
- * 2. Updates the user's OTP in the database
- * 3. Sends the new OTP to the user
- */
+// User login
+export const userLogin: RequestHandler = async (req, res, next) => {
+  try {
+    console.log('Login attempt with data:', req.value);
+    const data = <IUserLogin>req.value;
+
+    const user = await UserDal.getUserByEmailOrPhoneNumber(
+      data.emailOrPhoneNumber
+    );
+    console.log('User found:', user ? 'Yes' : 'No');
+    
+    if (!user || !compareSync(data.password, user.password)) {
+      console.log('Login failed: Invalid credentials');
+      return next(new AppError("Invalid Login Credentials.", 400));
+    }
+
+    if (user.isEmailOrPhoneNumberChanged) {
+      await UserDal.updateIsEmailOrPhoneNumberChanged(user.id, false);
+    }
+
+    if (user.isPasswordChanged) {
+      await UserDal.updateIsPasswordChanged(user.id, false);
+    }
+
+    const userSessions = await SessionsDal.getUserSessions(user.id);
+    if (userSessions.length >= 3)
+      return next(
+        new AppError(
+          "Maximum number of sessions for this user has reached.",
+          400
+        )
+      );
+
+    let isOwner = false;
+    if (userSessions.length === 0) {
+      isOwner = true;
+    }
+
+    let userAgent = "Unknown";
+    if (req.headers["user-agent"]) {
+      userAgent = req.headers["user-agent"];
+    }
+
+    let deviceId = deviceIdGenerator(user.id);
+    const session = await SessionsDal.createSession({
+      userId: user.id,
+      deviceId,
+      deviceInfo: deviceInfo(userAgent),
+      expireDate: new Date(Date.now() + 20 * 60 * 1000),
+      isOwner,
+    });
+
+    const token = generateToken(user.id, "user", deviceId);
+
+    res.status(200).json({
+      status: "SUCCESS",
+      data: {
+        user,
+      },
+      token,
+      session,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Request OTP
 export const requestOtp: RequestHandler = async (req, res, next) => {
   try {
     const userData = await UserDal.getUser(req.params.userId);
@@ -123,12 +164,11 @@ export const requestOtp: RequestHandler = async (req, res, next) => {
     if (userData.isVerified)
       return next(new AppError("You account is already verified.", 400));
 
-    // Generate new OTP
+    // Generate OTP
     const otp = generateOtp();
     const hashedOtp = hashPayload(otp);
     const otpExpiresIn = new Date(Date.now() + 1 * 60 * 1000);
 
-    // Update user's OTP
     const user = await UserDal.updateOtp(
       req.params.userId,
       hashedOtp,
@@ -136,7 +176,7 @@ export const requestOtp: RequestHandler = async (req, res, next) => {
     );
     if (!user) return next(new AppError("User does not exists.", 404));
 
-    // Send new OTP
+    // Send OTP
     console.log(otp);
 
     res.status(200).json({
@@ -148,62 +188,7 @@ export const requestOtp: RequestHandler = async (req, res, next) => {
   }
 };
 
-/**
- * User login
- * This function:
- * 1. Validates user credentials
- * 2. Checks if account is verified
- * 3. Updates user status if needed
- * 4. Generates a JWT token for authentication
- */
-export const userLogin: RequestHandler = async (req, res, next) => {
-  try {
-    const data = <IUserLogin>req.value;
-
-    // Find user and validate credentials
-    const user = await UserDal.getUserByEmailOrPhoneNumber(
-      data.emailOrPhoneNumber
-    );
-
-    if (!user || !compareSync(data.password, user.password)) {
-      return next(new AppError("Invalid Login Credentials.", 400));
-    }
-
-    // Check if account is verified
-    if (!user.isVerified) {
-      return next(new AppError("Please verify your account first.", 400));
-    }
-
-    // Update user status if needed
-    if (user.isEmailOrPhoneNumberChanged) {
-      await UserDal.updateIsEmailOrPhoneNumberChanged(user.id, false);
-    }
-
-    if (user.isPasswordChanged) {
-      await UserDal.updateIsPasswordChanged(user.id, false);
-    }
-
-    // Generate device ID and token
-    const deviceId = deviceIdGenerator(user.id);
-    const token = generateToken(user.id, user.role, deviceId);
-
-    res.status(200).json({
-      status: "SUCCESS",
-      message: "Login successful",
-      data: {
-        user,
-        token
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Get user details
- * This function retrieves user information by ID
- */
+// Get user
 export const getUser: RequestHandler = async (req, res, next) => {
   try {
     const user = await UserDal.getUser(req.params.userId);

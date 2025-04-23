@@ -1,28 +1,25 @@
-// User schema definition for MongoDB using Mongoose
 import { Document, Schema } from "mongoose";
 
-// Interface defining the structure of a User document
 export interface IUserDocument extends Document {
-  firstName: string;        // User's first name
-  lastName: string;         // User's last name
-  email: string;           // User's email address (unique)
-  phoneNumber: string;     // User's phone number (unique)
-  password: string;        // Hashed password
-  role: string;            // User's role (default: "User")
-  isEmailOrPhoneNumberChanged: boolean;  // Flag for email/phone changes
-  isPasswordChanged: boolean;           // Flag for password changes
-  isVerified: boolean;     // Email verification status
-  isActive: boolean;       // Account active status
-  otp: string;            // One-time password for verification
-  otpExpiresIn: Date;     // OTP expiration timestamp
-  passwordResetToken: string;          // Token for password reset
-  passwordResetTokenExpiresIn: string; // Password reset token expiration
-  lastActivityDate: Date;  // Last user activity timestamp
-  createdAt: Date;        // Document creation timestamp
-  updatedAt: Date;        // Document last update timestamp
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  role: string;
+  isEmailOrPhoneNumberChanged: boolean;
+  isPasswordChanged: boolean;
+  isVerified: boolean;
+  isActive: boolean;
+  otp: string;
+  otpExpiresIn: Date;
+  passwordResetToken: string;
+  passwordResetTokenExpiresIn: string;
+  lastActivityDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-// Mongoose schema definition for User model
 export const userSchema = new Schema(
   {
     firstName: {
@@ -40,48 +37,48 @@ export const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "Email is required."],
-      unique: true,  // Ensures email uniqueness in the database
+      unique: true,
     },
     phoneNumber: {
       type: String,
       required: [true, "Phone number is required."],
-      unique: true,  // Ensures phone number uniqueness in the database
+      unique: true,
     },
     role: {
       type: String,
-      default: "User",  // Default role for new users
+      default: "User",
     },
     password: {
       type: String,
       required: [true, "Password is required."],
-      select: false,  // Password is not returned by default in queries
+      select: false,
     },
     isEmailOrPhoneNumberChanged: {
       type: Boolean,
-      default: false,  // Tracks if email or phone number was changed
+      default: false,
     },
     isPasswordChanged: {
       type: Boolean,
-      default: false,  // Tracks if password was changed
+      default: false,
     },
     isVerified: {
       type: Boolean,
-      default: false,  // Email verification status
+      default: false,
     },
     isActive: {
       type: Boolean,
-      default: true,  // Account active status
+      default: true,
     },
-    otp: String,  // One-time password for verification
-    otpExpiresIn: Date,  // OTP expiration timestamp
-    passwordResetToken: String,  // Token for password reset
-    passwordResetTokenExpiresIn: Date,  // Password reset token expiration
+    otp: String,
+    otpExpiresIn: Date,
+    passwordResetToken: String,
+    passwordResetTokenExpiresIn: Date,
   },
   {
     writeConcern: {
-      w: "majority",  // Ensures write operations are acknowledged by majority of nodes
-      j: true,        // Journaling enabled for durability
+      w: "majority",
+      j: true,
     },
-    timestamps: true,  // Automatically adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );

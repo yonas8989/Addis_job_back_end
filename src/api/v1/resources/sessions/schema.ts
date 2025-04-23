@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface ISessionsDocument extends Document {
-  user: mongoose.Types.ObjectId;
+  user: string;
   deviceId: string;
   deviceInfo: string;
   expireDate: Date;
@@ -31,7 +31,7 @@ export const sessionsSchema = new Schema(
     },
     isOwner: {
       type: Boolean,
-      default: false,
+      dafault: false,
     },
   },
   {
