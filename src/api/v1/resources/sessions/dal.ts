@@ -1,9 +1,10 @@
-import { ICreateSession, IDestroySession } from "./dto";
-import { ISessionsDocument } from "./schema";
-import { SessionsModel } from "./model";
-import { APIFeatures } from "../../../../utils/apiFeatures";
+import { ICreateSession, IDestroySession } from "./dto"; // Interfaces for session creation and destruction
+import { ISessionsDocument } from "./schema"; // Session document interface
+import { SessionsModel } from "./model"; // Mongoose model for sessions
+import { APIFeatures } from "../../../../utils/apiFeatures"; // Utility class for filtering, sorting, and pagination
 
 export class SessionsDal {
+  // Create a new session
   static async createSession(data: ICreateSession): Promise<ISessionsDocument> {
     try {
       const session = await SessionsModel.create({
@@ -19,6 +20,7 @@ export class SessionsDal {
     }
   }
 
+  // Get all sessions with optional filtering and pagination
   static async getAllSessions(
     query?: RequestQuery
   ): Promise<{ sessions: ISessionsDocument[]; totalResults: number }> {
@@ -27,18 +29,20 @@ export class SessionsDal {
         SessionsModel.find(),
         query
       )
-        .filter()
-        .sort()
-        .project()
-        .paginate();
-      const sessions = await apiFeatures.dbQuery;
-      const totalResults = await SessionsModel.countDocuments();
+        .filter() // Apply filtering
+        .sort() // Apply sorting
+        .project() // Select specific fields
+        .paginate(); // Apply pagination
+
+      const sessions = await apiFeatures.dbQuery; // Execute the query
+      const totalResults = await SessionsModel.countDocuments(); // Count total documents
       return { sessions, totalResults };
     } catch (error) {
       throw error;
     }
   }
 
+  // Get all sessions for a specific user
   static async getUserSessions(userId: string): Promise<ISessionsDocument[]> {
     try {
       const sessions = await SessionsModel.find({ user: userId });
@@ -48,6 +52,7 @@ export class SessionsDal {
     }
   }
 
+  // Get a session by its ID
   static async getSession(id: string): Promise<ISessionsDocument | null> {
     try {
       const session = await SessionsModel.findById(id);
@@ -57,6 +62,7 @@ export class SessionsDal {
     }
   }
 
+  // Get a session by user ID and device ID
   static async getSessionByUserAndDeviceId(
     userId: string,
     deviceId: string
@@ -69,6 +75,7 @@ export class SessionsDal {
     }
   }
 
+  // Destroy a session based on user ID and device ID
   static async destroySession(data: {
     userId: string;
     deviceId: string;
@@ -84,6 +91,7 @@ export class SessionsDal {
     }
   }
 
+  // Delete a session by its ID
   static async deleteSession(id: string): Promise<ISessionsDocument | null> {
     try {
       const session = await SessionsModel.findByIdAndDelete(id);
@@ -93,6 +101,7 @@ export class SessionsDal {
     }
   }
 
+  // Update the expiration date of a session
   static async updateSessionExpireDate(
     id: string,
     expireDate: Date
