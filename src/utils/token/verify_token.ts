@@ -15,13 +15,3 @@ export default (token: string): ICustomJwtPayload => {
   return verify(token, config.jwt.secret) as ICustomJwtPayload;
 };
 
-// Payload
-// iat - Issued at
-// exp - expire date
-//  {
-//   id:"sdfsgdfgdfh",
-//   role:"user",
-//   deviceId:"SDgsnlgnsdgn;gsdfg"
-//   iat:124235346356,
-//   exp:124235346568,
-//  }

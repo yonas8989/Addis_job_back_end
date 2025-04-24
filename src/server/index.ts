@@ -1,28 +1,26 @@
 import { createServer } from "http";
 import app from "./app";
 import db from "./db";
-import { generateToken, verifyToken } from "../utils/token";
+
 /**
- * Server
- * @param {}
- * @returns {}
+ * Initializes and starts the server, connecting to the database.
+ * Handles server shutdown gracefully on SIGINT.
  */
 export default () => {
   const port = (process.env.PORT as unknown as number) || 3000;
 
   const server = createServer(app);
 
+  // Start server
   server.listen(port, () => {
     console.log(`Listening on ${port}...`);
   });
 
+  // Connect to MongoDB
   const mongo = db.mongo();
 
-  // console.log(app._router.stack[5].handle.stack);
-
-  // Majestic close
+  // Graceful shutdown on SIGINT
   process.on("SIGINT", () => {
-    // mongo.close();
     server.close(() => {
       console.log("Server is closing");
     });

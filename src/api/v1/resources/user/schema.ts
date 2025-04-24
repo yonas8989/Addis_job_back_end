@@ -20,6 +20,7 @@ export interface IUserDocument extends Document {
   updatedAt: Date;
 }
 
+// User schema definition
 export const userSchema = new Schema(
   {
     firstName: {
@@ -37,48 +38,49 @@ export const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "Email is required."],
-      unique: true,
+      unique: true, // Email must be unique
     },
     phoneNumber: {
       type: String,
       required: [true, "Phone number is required."],
-      unique: true,
+      unique: true, // Phone number must be unique
     },
     role: {
       type: String,
-      default: "User",
+      default: "User", // Default role is "User"
     },
     password: {
       type: String,
       required: [true, "Password is required."],
-      select: false,
+      select: false, // Don't include the password field by default in queries
     },
     isEmailOrPhoneNumberChanged: {
       type: Boolean,
-      default: false,
+      default: false, // Flag for whether email/phone number has been changed
     },
     isPasswordChanged: {
       type: Boolean,
-      default: false,
+      default: false, // Flag for whether the password has been changed
     },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: false, // Default is unverified user
     },
     isActive: {
       type: Boolean,
-      default: true,
+      default: true, // Default is active user
     },
-    otp: String,
-    otpExpiresIn: Date,
-    passwordResetToken: String,
-    passwordResetTokenExpiresIn: Date,
+    otp: String, // OTP for user verification
+    otpExpiresIn: Date, // OTP expiration date
+    passwordResetToken: String, // Token for password reset
+    passwordResetTokenExpiresIn: Date, // Expiration date for the reset token
+    lastActivityDate: Date, // Timestamp for last activity
   },
   {
     writeConcern: {
-      w: "majority",
-      j: true,
+      w: "majority", // Ensures writes are acknowledged by a majority of nodes
+      j: true, // Journal writes to ensure durability
     },
-    timestamps: true,
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
 );

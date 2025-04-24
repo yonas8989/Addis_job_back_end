@@ -1,5 +1,6 @@
 import { Query, Document } from "mongoose";
 
+// Class to handle API query features (filter, sort, project, paginate)
 export class APIFeatures<T extends Document> {
   reqQuery: RequestQuery = {};
   dbQuery: Query<T[], T>;
@@ -19,6 +20,7 @@ export class APIFeatures<T extends Document> {
     }
   }
 
+  // Filter query based on request
   filter(): APIFeatures<T> {
     let queryObj = { ...this.reqQuery };
     const excludedFields = ["page", "sort", "limit", "fields"];
@@ -40,16 +42,12 @@ export class APIFeatures<T extends Document> {
       }
     });
 
-    // if (queryObj["title"]) {
-    //   const title = queryObj["title"];
-    //   queryObj = { ...queryObj, title: { $regex: new RegExp(title, "i") } };
-    // }
-
     this.dbQuery = this.dbQuery.find(queryObj);
 
     return this;
   }
 
+  // Sort query results
   sort(): APIFeatures<T> {
     if (this.reqQuery.sort) {
       const sortValue: string = this.reqQuery.sort;
@@ -60,6 +58,7 @@ export class APIFeatures<T extends Document> {
     return this;
   }
 
+  // Select specific fields to project in the query
   project(): APIFeatures<T> {
     if (this.reqQuery.fields) {
       const projectValue = this.reqQuery.fields;
@@ -70,6 +69,7 @@ export class APIFeatures<T extends Document> {
     return this;
   }
 
+  // Paginate query results
   paginate(): APIFeatures<T> {
     const page = this.reqQuery.page || 1;
     const limit = this.reqQuery.limit || 10;

@@ -1,7 +1,8 @@
 import { generate } from "otp-generator";
 
 /**
- * @returns {string}
+ * Generates a 4-digit OTP.
+ * @returns {string} - The generated OTP.
  */
 export const generateOtp = (): string => {
   return generate(4, {

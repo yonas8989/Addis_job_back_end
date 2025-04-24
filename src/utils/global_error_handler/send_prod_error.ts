@@ -1,11 +1,10 @@
-import { Response } from "express";
-import AppError from "../app_error";
+import { Response } from "express"; // Express Response object
+import AppError from "../app_error"; // Custom AppError class
 
 /**
- * Send Prod Error
- * @param {AppError} err
- * @param {Response} res
- * @returns {}
+ * Sends error response for production.
+ * @param {AppError} err - Error object with details
+ * @param {Response} res - Express response object
  */
 export default (err: AppError, res: Response) => {
   if (err.isOperational) {

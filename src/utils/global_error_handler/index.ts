@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AppError from "../app_error";
 import sendDevError from "./send_dev_error";
 import sendProdError from "./send_prod_error";
@@ -12,16 +12,19 @@ export default (
   res: Response,
   next: NextFunction
 ) => {
-  
+  // Set default status code and status if not already provided
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "ERROR";
 
-  // Handle Error
+  // Handle specific types of errors
   err = errors(err);
-  // Send Dev error
+
+  // Send detailed error for development or local environment
   if (configs.env === "local" || configs.env === "development") {
     sendDevError(err, res);
-  } else if (configs.env === "qa" || configs.env === "production") {
+  } 
+  // Send generic error for production or QA environments
+  else if (configs.env === "qa" || configs.env === "production") {
     sendProdError(err, res);
   }
 };
