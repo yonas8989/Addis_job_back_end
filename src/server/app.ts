@@ -1,39 +1,41 @@
-import AppError from "../utils/app_error"; // Import custom error handler
-import geh from "../utils/global_error_handler"; // Import global error handler
-import config from "../config"; // Import app configuration
-import express, { Application, NextFunction, Request, Response } from "express"; // Import express and types
-import { v1 } from "./routes"; // Import version 1 routes
+import AppError from "../utils/app_error";
+import geh from "../utils/global_error_handler";
+import config from "../config";
+import express, { Application, NextFunction, Request, Response } from "express";
+import { v1 } from "./routes";
+import cors from "cors"; // Now properly typed after installing @types/cors
 
-// Initialize express application
 const app: Application = express();
 
-// Built-in middlewares for JSON and URL encoded data
+// CORS Middleware
+app.use(cors({
+  origin: config.cors.allowedOrigins,
+  methods: config.cors.methods,
+  allowedHeaders: config.cors.allowedHeaders,
+  credentials: true
+}));
+
+// Built-in middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// API Key validation middleware
+// API Key middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const apiKey = req.headers["x-api-key"]; // Get API key from headers
-
-  // If API Key is missing or invalid
-  if (!apiKey) {
-    return next(new AppError("Please provide the API Key", 400));
-  }
-  if (config.api_key !== apiKey)
-    return next(new AppError("Invalid API Key", 400));
-
-  next(); // Proceed to the next middleware or route
+  const apiKey = req.headers["x-api-key"];
+  if (!apiKey) return next(new AppError("Please provide the API Key", 400));
+  if (config.api_key !== apiKey) return next(new AppError("Invalid API Key", 400));
+  next();
 });
 
-// Use v1 routes
+// Routes
 v1(app);
 
-// Handle unknown URLs
+// 404 Handler
 app.use("*", (req: Request, res: Response, next: NextFunction) => {
-  return next(new AppError(`Unknown URL`, 404)); // Handle 404 errors for unknown routes
+  return next(new AppError(`Unknown URL`, 404));
 });
 
-// Global error handler middleware
+// Global error handler
 app.use(geh);
 
-export default app; // Export app for use in other files
+export default app;
