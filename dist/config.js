@@ -1,13 +1,9 @@
 "use strict";
-/**
- * Configuration module for managing environment variables and application settings
- * This file handles different environment configurations and exports them for use throughout the application
- */
 Object.defineProperty(exports, "__esModule", { value: true });
+// Load environment variables from a .env file
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
-// Determine the API URL based on the current environment
-// Defaults to local environment if no specific environment is set
+// Set the API URL based on the environment
 let api_url = process.env.API_URL_LOCAL;
 if (process.env.NODE_ENV === "development") {
     api_url = process.env.API_URL_DEVELOPMENT;
@@ -18,24 +14,26 @@ else if (process.env.NODE_ENV === "qa") {
 else if (process.env.NODE_ENV === "production") {
     api_url = process.env.API_URL_PROD;
 }
-// Main configuration object that exports all environment-specific settings
+// Export configurations
 exports.default = {
-    // Current environment (development, qa, production)
     env: process.env.NODE_ENV,
-    // Database configuration
     db: {
-        // Remote database connection string
         remote: process.env.DB_REMOTE,
     },
-    // API authentication key
     api_key: process.env.API_KEY,
-    // Key used for secure deletion operations
     delete_key: process.env.DELETE_KEY,
-    // JWT (JSON Web Token) configuration
     jwt: {
-        // Token expiration time
         expiresin: process.env.JWT_EXPIRESIN,
-        // Secret key for JWT signing
         secret: process.env.JWT_SECRET,
     },
+    // Add these new configurations
+    frontend_url: process.env.FRONTEND_URL || "http://localhost:5173",
+    cors: {
+        allowedOrigins: [
+            process.env.FRONTEND_URL || "http://localhost:5173",
+            // Add other allowed origins if needed
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "x-api-key"]
+    }
 };
