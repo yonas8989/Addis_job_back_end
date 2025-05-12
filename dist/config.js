@@ -28,6 +28,7 @@ exports.default = {
     },
     // Add these new configurations
     frontend_url: process.env.FRONTEND_URL || "http://localhost:5173",
+    flask_api_url: process.env.FLASK_API_URL || "http://localhost:5001",
     cors: {
         allowedOrigins: [
             process.env.FRONTEND_URL || "http://localhost:5173",

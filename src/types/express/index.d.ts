@@ -1,15 +1,13 @@
+import { IUserDocument } from "../user/schema"; // Adjust path to where IUserDocument is defined
+
 export {};
 
 declare global {
   namespace Express {
     interface Request {
-      admin: object; // Custom property for storing admin-related data
-      user?: {
-        id: string;
-        // Add other user properties you use
-        role?: string;
-      };
-      value: object; // Custom property for storing validation-related data
+      admin?: object; // Keep as object if admin type is not yet defined
+      user?: IUserDocument; // Use IUserDocument for user
+      value?: object; // Keep as object if value type is generic or not yet defined
     }
   }
 }

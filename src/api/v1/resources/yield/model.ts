@@ -1,4 +1,4 @@
-import { yieldSchema, IYieldDocument } from './schema';
-import { model } from 'mongoose';
+import { yieldSchema, IYieldDocument } from "./schema";
+import { model } from "mongoose";
 
-export const YieldModel = model<IYieldDocument>('Yield', yieldSchema);
+export const YieldModel = model<IYieldDocument>("YieldPrediction", yieldSchema);

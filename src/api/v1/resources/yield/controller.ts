@@ -1,103 +1,74 @@
-import { RequestHandler } from 'express';
-import { YieldDal } from './dta';
-import { predictYield } from '../../../../utils/yieldService';
-import AppError from '../../../../utils/app_error';
-import { IYieldPredictionRequest } from './dto';
+import { RequestHandler } from "express";
+import { ICreateYieldPrediction } from "./dto";
+import { YieldDal } from "./dal";
+import AppError from "../../../../utils/app_error";
 
+// Create yield prediction handler
 export const createYieldPrediction: RequestHandler = async (req, res, next) => {
   try {
-    const data = req.body as IYieldPredictionRequest;
-    
-    // Authentication check
-    if (!req.user) {
-      return next(new AppError('Authentication required', 401));
-    }
-    const userId = req.user.id;
+    const data = <ICreateYieldPrediction>req.value;
+    const userId = req.user.id; // Assuming user ID is available from protect middleware
 
-    // Input validation
-    if (!data.humidity || !data.temperatureMax || !data.temperatureMin || !data.windSpeed) {
-      return next(new AppError('All weather parameters are required', 400));
-    }
-
-    // Get prediction from ML service
-    const predictedYield = await predictYield(data);
-
-    // Save to database
-    const yieldRecord = await YieldDal.createYieldPrediction({
+    // Create yield prediction in database
+    const prediction = await YieldDal.createYieldPrediction({
       ...data,
-      predictedYield,
-      userId
+      userId,
+      predictionDate: new Date(),
     });
 
-    res.status(201).json({
-      status: 'SUCCESS',
+    // Respond with success message
+    res.status(200).json({
+      status: "SUCCESS",
+      message: "Yield prediction created successfully.",
       data: {
-        yield: yieldRecord
-      }
+        prediction,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
+// Get yield prediction history handler
 export const getYieldHistory: RequestHandler = async (req, res, next) => {
   try {
-    // Authentication check
-    if (!req.user) {
-      return next(new AppError('Authentication required', 401));
-    }
-    const userId = req.user.id;
+    const userId = req.user.id; // Assuming user ID is available from protect middleware
+    const { page = 1, limit = 10 } = req.query;
 
-    const { startDate, endDate } = req.query;
+    // Fetch yield prediction history
+    const history = await YieldDal.getYieldHistory(userId, {
+      page: parseInt(page as string),
+      limit: parseInt(limit as string),
+    });
 
-    // Date validation
-    if (startDate && isNaN(Date.parse(startDate as string))) {
-      return next(new AppError('Invalid start date format', 400));
-    }
-    if (endDate && isNaN(Date.parse(endDate as string))) {
-      return next(new AppError('Invalid end date format', 400));
-    }
-
-    const history = await YieldDal.getYieldHistory(
-      userId,
-      startDate ? new Date(startDate as string) : undefined,
-      endDate ? new Date(endDate as string) : undefined
-    );
-
+    // Respond with history
     res.status(200).json({
-      status: 'SUCCESS',
-      results: history.length,
+      status: "SUCCESS",
       data: {
-        history
-      }
+        history,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
+// Get single yield prediction handler
 export const getYieldPrediction: RequestHandler = async (req, res, next) => {
   try {
-    // Authentication check (if prediction is user-specific)
-    if (!req.user) {
-      return next(new AppError('Authentication required', 401));
-    }
+    const prediction = await YieldDal.getYieldPrediction(req.params.id);
+    if (!prediction) return next(new AppError("Yield prediction not found.", 404));
 
-    const prediction = await YieldDal.getYieldPredictionById(req.params.id);
-    if (!prediction) {
-      return next(new AppError('Yield prediction not found', 404));
-    }
-
-    // Optional: Verify prediction belongs to user
+    // Ensure the user owns the prediction
     if (prediction.userId.toString() !== req.user.id) {
-      return next(new AppError('Unauthorized to access this prediction', 403));
+      return next(new AppError("Unauthorized access to prediction.", 403));
     }
 
     res.status(200).json({
-      status: 'SUCCESS',
+      status: "SUCCESS",
       data: {
-        prediction
-      }
+        prediction,
+      },
     });
   } catch (error) {
     next(error);
