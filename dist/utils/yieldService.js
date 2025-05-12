@@ -15,26 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.predictYield = void 0;
 const axios_1 = __importDefault(require("axios"));
 const app_error_1 = __importDefault(require("../utils/app_error"));
-const config_1 = __importDefault(require("../config")); // Import your config
+const config_1 = __importDefault(require("../config"));
 const predictYield = (weatherData) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     try {
-        const response = yield axios_1.default.post(`${config_1.default.flask_api_url}/predict`, // Use from config
-        weatherData, {
+        const response = yield axios_1.default.post(`${config_1.default.flask_api_url}/predict`, weatherData, {
             headers: {
                 "Content-Type": "application/json",
-                // Add authentication if your Flask API requires it
-                "x-api-key": config_1.default.api_key
-            }
+                "x-api-key": config_1.default.api_key, // Authentication for Flask API
+            },
         });
-        if (!response.data.status || response.data.status !== "SUCCESS") {
-            throw new app_error_1.default("Prediction failed", 400);
+        // Normalize status to handle both "success" (mock) and "SUCCESS" (potential Flask API)
+        const status = (_a = response.data.status) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+        if (!status || status !== "success") {
+            throw new app_error_1.default(`Prediction failed: ${response.data.error || "Unknown error"}`, 400);
+        }
+        // Validate prediction value
+        if (typeof response.data.prediction !== "number" || isNaN(response.data.prediction)) {
+            throw new app_error_1.default("Invalid prediction value received", 400);
         }
         return response.data.prediction;
     }
     catch (error) {
         if (axios_1.default.isAxiosError(error)) {
-            throw new app_error_1.default(`ML API Error: ${((_b = (_a = error.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.error) || error.message}`, ((_c = error.response) === null || _c === void 0 ? void 0 : _c.status) || 500);
+            const message = ((_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.error) || error.message;
+            const status = ((_d = error.response) === null || _d === void 0 ? void 0 : _d.status) || 500;
+            throw new app_error_1.default(`ML API Error: ${message}`, status);
         }
         throw error;
     }

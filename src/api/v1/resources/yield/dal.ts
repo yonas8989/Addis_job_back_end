@@ -5,7 +5,11 @@ import { IYieldDocument } from "./schema";
 export class YieldDal {
   // Create a new yield prediction
   static async createYieldPrediction(
-    data: ICreateYieldPrediction & { userId: string; predictionDate: Date }
+    data: ICreateYieldPrediction & {
+      userId: string;
+      predictionDate: Date;
+      predictedYield: number; // Ensure predictedYield is required
+    }
   ): Promise<IYieldDocument> {
     try {
       const prediction = await YieldModel.create(data);

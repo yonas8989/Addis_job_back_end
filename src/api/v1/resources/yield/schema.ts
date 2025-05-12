@@ -6,9 +6,10 @@ export interface IYieldDocument extends Document {
   fieldSize: number;
   soilType: string;
   weatherConditions: {
-    temperature: number;
-    rainfall: number;
+    temperatureMax: number;
+    temperatureMin: number;
     humidity: number;
+    windSpeed: number;
   };
   predictedYield: number;
   predictionDate: Date;
@@ -21,7 +22,7 @@ export const yieldSchema = new Schema(
     userId: {
       type: String,
       required: [true, "User ID is required."],
-      index: true, // Index for faster queries
+      index: true,
     },
     cropType: {
       type: String,
@@ -39,20 +40,24 @@ export const yieldSchema = new Schema(
       maxlength: [50, "Soil type cannot exceed 50 characters."],
     },
     weatherConditions: {
-      temperature: {
+      temperatureMax: {
         type: Number,
-        required: [true, "Temperature is required."],
+        required: [true, "Maximum temperature is required."],
       },
-      rainfall: {
+      temperatureMin: {
         type: Number,
-        required: [true, "Rainfall is required."],
-        min: [0, "Rainfall cannot be negative."],
+        required: [true, "Minimum temperature is required."],
       },
       humidity: {
         type: Number,
         required: [true, "Humidity is required."],
         min: [0, "Humidity cannot be negative."],
         max: [100, "Humidity cannot exceed 100%."],
+      },
+      windSpeed: {
+        type: Number,
+        required: [true, "Wind speed is required."],
+        min: [0, "Wind speed cannot be negative."],
       },
     },
     predictedYield: {
@@ -70,6 +75,6 @@ export const yieldSchema = new Schema(
       w: "majority",
       j: true,
     },
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );

@@ -3,9 +3,10 @@ export interface ICreateYieldPrediction {
   fieldSize: number; // in hectares
   soilType: string;
   weatherConditions: {
-    temperature: number; // in Celsius
-    rainfall: number; // in mm
+    temperatureMax: number; // in Celsius
+    temperatureMin: number; // in Celsius
     humidity: number; // in percentage
+    windSpeed: number; // in km/h
   };
-  predictedYield: number; // in tons per hectare
+  predictedYield?: number; // Optional, will be set by Flask API
 }

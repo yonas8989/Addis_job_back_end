@@ -9,4 +9,5 @@ const resources_1 = require("../../api/v1/resources");
 exports.default = (app) => {
     app.use("/api/v1/user", resources_1.user);
     app.use("/api/v1/sessions", resources_1.sessions);
+    app.use("/api/v1/yields", resources_1.yields);
 };

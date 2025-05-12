@@ -15,13 +15,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getYieldPrediction = exports.getYieldHistory = exports.createYieldPrediction = void 0;
 const dal_1 = require("./dal");
 const app_error_1 = __importDefault(require("../../../../utils/app_error"));
+const yieldService_1 = require("../../../../utils/yieldService");
 // Create yield prediction handler
 const createYieldPrediction = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.value;
-        const userId = req.user.id; // Assuming user ID is available from protect middleware
+        if (!req.user) {
+            return next(new app_error_1.default("User not authenticated.", 401));
+        }
+        const userId = req.user.id;
+        // Call Flask API to get predicted yield
+        const predictedYield = yield (0, yieldService_1.predictYield)({
+            humidity: data.weatherConditions.humidity,
+            temperatureMax: data.weatherConditions.temperatureMax,
+            temperatureMin: data.weatherConditions.temperatureMin,
+            windSpeed: data.weatherConditions.windSpeed,
+        });
         // Create yield prediction in database
-        const prediction = yield dal_1.YieldDal.createYieldPrediction(Object.assign(Object.assign({}, data), { userId, predictionDate: new Date() }));
+        const prediction = yield dal_1.YieldDal.createYieldPrediction(Object.assign(Object.assign({}, data), { userId,
+            predictedYield, predictionDate: new Date() }));
         // Respond with success message
         res.status(200).json({
             status: "SUCCESS",
@@ -39,7 +51,10 @@ exports.createYieldPrediction = createYieldPrediction;
 // Get yield prediction history handler
 const getYieldHistory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = req.user.id; // Assuming user ID is available from protect middleware
+        if (!req.user) {
+            return next(new app_error_1.default("User not authenticated.", 401));
+        }
+        const userId = req.user.id;
         const { page = 1, limit = 10 } = req.query;
         // Fetch yield prediction history
         const history = yield dal_1.YieldDal.getYieldHistory(userId, {
@@ -65,6 +80,9 @@ const getYieldPrediction = (req, res, next) => __awaiter(void 0, void 0, void 0,
         const prediction = yield dal_1.YieldDal.getYieldPrediction(req.params.id);
         if (!prediction)
             return next(new app_error_1.default("Yield prediction not found.", 404));
+        if (!req.user) {
+            return next(new app_error_1.default("User not authenticated.", 401));
+        }
         // Ensure the user owns the prediction
         if (prediction.userId.toString() !== req.user.id) {
             return next(new app_error_1.default("Unauthorized access to prediction.", 403));

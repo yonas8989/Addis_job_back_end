@@ -19,14 +19,13 @@ export const yieldPredictionValidation = Joi.object({
     "any.required": "Soil type is required",
   }),
   weatherConditions: Joi.object({
-    temperature: Joi.number().required().messages({
-      "number.base": "Temperature should be a number",
-      "any.required": "Temperature is required",
+    temperatureMax: Joi.number().required().messages({
+      "number.base": "Maximum temperature should be a number",
+      "any.required": "Maximum temperature is required",
     }),
-    rainfall: Joi.number().min(0).required().messages({
-      "number.base": "Rainfall should be a number",
-      "number.min": "Rainfall cannot be negative",
-      "any.required": "Rainfall is required",
+    temperatureMin: Joi.number().required().messages({
+      "number.base": "Minimum temperature should be a number",
+      "any.required": "Minimum temperature is required",
     }),
     humidity: Joi.number().min(0).max(100).required().messages({
       "number.base": "Humidity should be a number",
@@ -34,13 +33,17 @@ export const yieldPredictionValidation = Joi.object({
       "number.max": "Humidity cannot exceed 100%",
       "any.required": "Humidity is required",
     }),
+    windSpeed: Joi.number().min(0).required().messages({
+      "number.base": "Wind speed should be a number",
+      "number.min": "Wind speed cannot be negative",
+      "any.required": "Wind speed is required",
+    }),
   }).required().messages({
     "any.required": "Weather conditions are required",
   }),
-  predictedYield: Joi.number().min(0).required().messages({
+  predictedYield: Joi.number().min(0).optional().messages({
     "number.base": "Predicted yield should be a number",
     "number.min": "Predicted yield cannot be negative",
-    "any.required": "Predicted yield is required",
   }),
 });
 

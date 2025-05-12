@@ -1,6 +1,6 @@
 import axios from "axios";
 import AppError from "../utils/app_error";
-import config from "../config";  // Import your config
+import config from "../config";
 
 export const predictYield = async (weatherData: {
   humidity: number;
@@ -10,29 +10,36 @@ export const predictYield = async (weatherData: {
 }) => {
   try {
     const response = await axios.post(
-      `${config.flask_api_url}/predict`,  // Use from config
+      `${config.flask_api_url}/predict`,
       weatherData,
       {
         headers: {
           "Content-Type": "application/json",
-          // Add authentication if your Flask API requires it
-          "x-api-key": config.api_key  
-        }
+          "x-api-key": config.api_key, // Authentication for Flask API
+        },
       }
     );
-    
-    if (!response.data.status || response.data.status !== "SUCCESS") {
-      throw new AppError("Prediction failed", 400);
+
+    // Normalize status to handle both "success" (mock) and "SUCCESS" (potential Flask API)
+    const status = response.data.status?.toLowerCase();
+    if (!status || status !== "success") {
+      throw new AppError(
+        `Prediction failed: ${response.data.error || "Unknown error"}`,
+        400
+      );
     }
-    
+
+    // Validate prediction value
+    if (typeof response.data.prediction !== "number" || isNaN(response.data.prediction)) {
+      throw new AppError("Invalid prediction value received", 400);
+    }
+
     return response.data.prediction;
-    
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new AppError(
-        `ML API Error: ${error.response?.data?.error || error.message}`,
-        error.response?.status || 500
-      );
+      const message = error.response?.data?.error || error.message;
+      const status = error.response?.status || 500;
+      throw new AppError(`ML API Error: ${message}`, status);
     }
     throw error;
   }
