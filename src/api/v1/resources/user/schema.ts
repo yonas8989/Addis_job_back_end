@@ -35,6 +35,11 @@ export const userSchema = new Schema(
       maxlength: [50, "Last name can not exceed 50 characters."],
       minlength: [1, "Last name can not be less than 1 character."],
     },
+    // Add to the userSchema
+    profilePicture: {
+      type: String,
+      default: null,
+    },
     email: {
       type: String,
       required: [true, "Email is required."],
@@ -76,6 +81,7 @@ export const userSchema = new Schema(
     passwordResetTokenExpiresIn: Date, // Expiration date for the reset token
     lastActivityDate: Date, // Timestamp for last activity
   },
+
   {
     writeConcern: {
       w: "majority", // Ensures writes are acknowledged by a majority of nodes

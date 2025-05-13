@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express"); // Import Router
-const router = (0, express_1.Router)(); // Initialize router
+const express_1 = require("express");
+const router = (0, express_1.Router)();
 // Import middleware functions
 const middleware_1 = require("../middleware");
 // Import validation schemas
@@ -20,4 +20,11 @@ router.patch("/:userId/verifyotp", (0, middleware_1.validator)(validations_1.ver
 router.patch("/:userId/requestotp", middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), middleware_1.verifyUser, controller_1.requestOtp);
 // Get user route (with authentication and role check)
 router.route("/:userId").get(middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), middleware_1.verifyUser, controller_1.getUser);
-exports.default = router; // Export router
+// Profile routes
+router
+    .route("/profile")
+    .get(middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), controller_1.getProfile, middleware_1.verifyUser)
+    .put(middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), (0, middleware_1.validator)(validations_1.updateProfileValidation), controller_1.updateProfile);
+// Profile picture upload route
+router.post("/profile-picture", middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), (0, middleware_1.validator)(validations_1.profilePictureValidation), controller_1.uploadProfilePicture);
+exports.default = router;

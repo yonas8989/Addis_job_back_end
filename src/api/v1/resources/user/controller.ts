@@ -9,6 +9,8 @@ import { generateToken } from "../../../../utils/token";
 import { SessionsDal } from "../sessions/dal";
 import { deviceInfo } from "../../../../utils/deviceInfo";
 import { deviceIdGenerator } from "../../../../utils/deviceIdGenerator";
+import { IUpdateProfile, IProfilePicture } from "./dto";
+import { UserModel } from "./model";
 
 // Create user handler
 export const createUser: RequestHandler = async (req, res, next) => {
@@ -93,22 +95,21 @@ export const verifyOtp: RequestHandler = async (req, res, next) => {
   }
 };
 
-// User login handler
 export const userLogin: RequestHandler = async (req, res, next) => {
   try {
-    console.log('Login attempt with data:', req.value);
     const data = <IUserLogin>req.value;
 
     // Get user by email or phone
     const user = await UserDal.getUserByEmailOrPhoneNumber(
       data.emailOrPhoneNumber
     );
-    console.log('User found:', user ? 'Yes' : 'No');
-    
-    // Check credentials
+    // Check credentials and verification status
     if (!user || !compareSync(data.password, user.password)) {
       console.log('Login failed: Invalid credentials');
       return next(new AppError("Invalid Login Credentials.", 400));
+    }
+    if (!user.isVerified) {
+      return next(new AppError("Please verify your account with OTP before logging in.", 403));
     }
 
     // Reset flags if changed
@@ -216,6 +217,96 @@ export const getUser: RequestHandler = async (req, res, next) => {
       status: "SUCCESS",
       data: {
         user,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// Add to existing imports
+
+
+
+
+// Get user profile
+export const getProfile: RequestHandler = async (req, res, next) => {
+  try {
+    // req.user is set by the protect middleware
+    const user = await UserDal.getUser(req.user.id);
+    if (!user) return next(new AppError("User does not exist.", 404));
+
+    res.status(200).json({
+      status: "SUCCESS",
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update user profile
+export const updateProfile: RequestHandler = async (req, res, next) => {
+  try {
+    const data = <IUpdateProfile>req.value;
+    const userId = req.user.id; // From protect middleware
+
+    // Check if email or phone number is being updated
+    if (data.email || data.phoneNumber) {
+      await UserDal.updateIsEmailOrPhoneNumberChanged(userId, true);
+    }
+
+    // Update user in database
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      data,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return next(new AppError("User does not exist.", 404));
+    }
+
+    res.status(200).json({
+      status: "SUCCESS",
+      message: "Profile updated successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Upload profile picture
+export const uploadProfilePicture: RequestHandler = async (req, res, next) => {
+  try {
+    const data = <IProfilePicture>req.value;
+    const userId = req.user.id; // From protect middleware
+
+    // In a real application, you would:
+    // 1. Process the image (resize, optimize, etc.)
+    // 2. Upload to cloud storage (AWS S3, Cloudinary, etc.)
+    // 3. Save the URL or path in the database
+    
+    // For this example, we'll just store the base64 string
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      { profilePicture: data.image },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return next(new AppError("User does not exist.", 404));
+    }
+
+    res.status(200).json({
+      status: "SUCCESS",
+      message: "Profile picture uploaded successfully",
+      data: {
+        user: updatedUser,
       },
     });
   } catch (error) {

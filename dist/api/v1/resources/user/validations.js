@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyOtpValidation = exports.userLoginValidation = exports.createUserValidation = void 0;
+exports.profilePictureValidation = exports.updateProfileValidation = exports.verifyOtpValidation = exports.userLoginValidation = exports.createUserValidation = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.createUserValidation = joi_1.default.object({
     firstName: joi_1.default.string().max(50).min(1).required().messages({
@@ -76,5 +76,37 @@ exports.verifyOtpValidation = joi_1.default.object({
         "string.max": "OTP can not exceed 4 characters",
         "string.min": "OTP can not be less than 4 characters",
         "any.required": "OTP is required",
+    }),
+});
+exports.updateProfileValidation = joi_1.default.object({
+    firstName: joi_1.default.string().max(50).min(1).optional().messages({
+        "string.base": "First name should be a string",
+        "string.empty": "First name can not be empty",
+        "string.min": "First name can not be less than 1 character",
+        "string.max": "First name can not exceed 50 characters",
+    }),
+    lastName: joi_1.default.string().max(50).min(1).optional().messages({
+        "string.base": "Last name should be a string",
+        "string.empty": "Last name can not be empty",
+        "string.min": "Last name can not be less than 1 character",
+        "string.max": "Last name can not exceed 50 characters",
+    }),
+    email: joi_1.default.string().email().optional().messages({
+        "string.base": "Email should be a string",
+        "string.empty": "Email can not be empty",
+        "string.email": "Email must be a valid email",
+    }),
+    phoneNumber: joi_1.default.string().max(15).min(10).optional().messages({
+        "string.base": "Phone number should be a string",
+        "string.empty": "Phone number can not be empty",
+        "string.min": "Phone number can not be less than 10 characters",
+        "string.max": "Phone number can not exceed 15 characters",
+    }),
+});
+exports.profilePictureValidation = joi_1.default.object({
+    image: joi_1.default.string().required().messages({
+        "string.base": "Image should be a string",
+        "string.empty": "Image can not be empty",
+        "any.required": "Image is required",
     }),
 });

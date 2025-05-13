@@ -1,4 +1,4 @@
-import { ICreateUser } from "./dto";
+import { ICreateUser, IUpdateProfile } from "./dto";
 import { UserModel } from "./model";
 import { IUserDocument } from "./schema";
 
@@ -105,6 +105,37 @@ export class UserDal {
       return user;
     } catch (error) {
       throw error; // Throw any errors encountered
+    }
+  }
+  // Add to UserDal class
+  static async updateProfile(
+    id: string,
+    data: IUpdateProfile
+  ): Promise<IUserDocument | null> {
+    try {
+      const user = await UserModel.findByIdAndUpdate(id, data, {
+        runValidators: true,
+        new: true,
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateProfilePicture(
+    id: string,
+    image: string
+  ): Promise<IUserDocument | null> {
+    try {
+      const user = await UserModel.findByIdAndUpdate(
+        id,
+        { profilePicture: image },
+        { new: true }
+      );
+      return user;
+    } catch (error) {
+      throw error;
     }
   }
 }

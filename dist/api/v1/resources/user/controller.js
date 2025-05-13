@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUser = exports.requestOtp = exports.userLogin = exports.verifyOtp = exports.createUser = void 0;
+exports.uploadProfilePicture = exports.updateProfile = exports.getProfile = exports.getUser = exports.requestOtp = exports.userLogin = exports.verifyOtp = exports.createUser = void 0;
 const hashPayload_1 = require("../../../../utils/hashPayload");
 const generateOtp_1 = require("../../../../utils/generateOtp");
 const dal_1 = require("./dal");
@@ -22,6 +22,7 @@ const token_1 = require("../../../../utils/token");
 const dal_2 = require("../sessions/dal");
 const deviceInfo_1 = require("../../../../utils/deviceInfo");
 const deviceIdGenerator_1 = require("../../../../utils/deviceIdGenerator");
+const model_1 = require("./model");
 // Create user handler
 const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -95,18 +96,18 @@ const verifyOtp = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.verifyOtp = verifyOtp;
-// User login handler
 const userLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('Login attempt with data:', req.value);
         const data = req.value;
         // Get user by email or phone
         const user = yield dal_1.UserDal.getUserByEmailOrPhoneNumber(data.emailOrPhoneNumber);
-        console.log('User found:', user ? 'Yes' : 'No');
-        // Check credentials
+        // Check credentials and verification status
         if (!user || !(0, bcryptjs_1.compareSync)(data.password, user.password)) {
             console.log('Login failed: Invalid credentials');
             return next(new app_error_1.default("Invalid Login Credentials.", 400));
+        }
+        if (!user.isVerified) {
+            return next(new app_error_1.default("Please verify your account with OTP before logging in.", 403));
         }
         // Reset flags if changed
         if (user.isEmailOrPhoneNumberChanged) {
@@ -204,3 +205,77 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.getUser = getUser;
+// Add to existing imports
+// Get user profile
+const getProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // req.user is set by the protect middleware
+        const user = yield dal_1.UserDal.getUser(req.user.id);
+        if (!user)
+            return next(new app_error_1.default("User does not exist.", 404));
+        res.status(200).json({
+            status: "SUCCESS",
+            data: {
+                user,
+            },
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getProfile = getProfile;
+// Update user profile
+const updateProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = req.value;
+        const userId = req.user.id; // From protect middleware
+        // Check if email or phone number is being updated
+        if (data.email || data.phoneNumber) {
+            yield dal_1.UserDal.updateIsEmailOrPhoneNumberChanged(userId, true);
+        }
+        // Update user in database
+        const updatedUser = yield model_1.UserModel.findByIdAndUpdate(userId, data, { new: true, runValidators: true });
+        if (!updatedUser) {
+            return next(new app_error_1.default("User does not exist.", 404));
+        }
+        res.status(200).json({
+            status: "SUCCESS",
+            message: "Profile updated successfully",
+            data: {
+                user: updatedUser,
+            },
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.updateProfile = updateProfile;
+// Upload profile picture
+const uploadProfilePicture = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = req.value;
+        const userId = req.user.id; // From protect middleware
+        // In a real application, you would:
+        // 1. Process the image (resize, optimize, etc.)
+        // 2. Upload to cloud storage (AWS S3, Cloudinary, etc.)
+        // 3. Save the URL or path in the database
+        // For this example, we'll just store the base64 string
+        const updatedUser = yield model_1.UserModel.findByIdAndUpdate(userId, { profilePicture: data.image }, { new: true });
+        if (!updatedUser) {
+            return next(new app_error_1.default("User does not exist.", 404));
+        }
+        res.status(200).json({
+            status: "SUCCESS",
+            message: "Profile picture uploaded successfully",
+            data: {
+                user: updatedUser,
+            },
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.uploadProfilePicture = uploadProfilePicture;

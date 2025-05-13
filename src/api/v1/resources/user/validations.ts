@@ -78,3 +78,36 @@ export const verifyOtpValidation = Joi.object({
     "any.required": "OTP is required",
   }),
 });
+export const updateProfileValidation = Joi.object({
+  firstName: Joi.string().max(50).min(1).optional().messages({
+    "string.base": "First name should be a string",
+    "string.empty": "First name can not be empty",
+    "string.min": "First name can not be less than 1 character",
+    "string.max": "First name can not exceed 50 characters",
+  }),
+  lastName: Joi.string().max(50).min(1).optional().messages({
+    "string.base": "Last name should be a string",
+    "string.empty": "Last name can not be empty",
+    "string.min": "Last name can not be less than 1 character",
+    "string.max": "Last name can not exceed 50 characters",
+  }),
+  email: Joi.string().email().optional().messages({
+    "string.base": "Email should be a string",
+    "string.empty": "Email can not be empty",
+    "string.email": "Email must be a valid email",
+  }),
+  phoneNumber: Joi.string().max(15).min(10).optional().messages({
+    "string.base": "Phone number should be a string",
+    "string.empty": "Phone number can not be empty",
+    "string.min": "Phone number can not be less than 10 characters",
+    "string.max": "Phone number can not exceed 15 characters",
+  }),
+});
+
+export const profilePictureValidation = Joi.object({
+  image: Joi.string().required().messages({
+    "string.base": "Image should be a string",
+    "string.empty": "Image can not be empty",
+    "any.required": "Image is required",
+  }),
+});

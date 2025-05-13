@@ -109,5 +109,31 @@ class UserDal {
             }
         });
     }
+    // Add to UserDal class
+    static updateProfile(id, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield model_1.UserModel.findByIdAndUpdate(id, data, {
+                    runValidators: true,
+                    new: true,
+                });
+                return user;
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
+    static updateProfilePicture(id, image) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield model_1.UserModel.findByIdAndUpdate(id, { profilePicture: image }, { new: true });
+                return user;
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
 }
 exports.UserDal = UserDal;

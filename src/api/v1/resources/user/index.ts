@@ -1,5 +1,5 @@
-import { Router } from "express"; // Import Router
-const router = Router(); // Initialize router
+import { Router } from "express";
+const router = Router();
 
 // Import middleware functions
 import { validator, protect, auth, verifyUser } from "../middleware";
@@ -9,6 +9,8 @@ import {
   createUserValidation,
   userLoginValidation,
   verifyOtpValidation,
+  updateProfileValidation,
+  profilePictureValidation,
 } from "./validations";
 
 // Import controller functions
@@ -18,6 +20,9 @@ import {
   verifyOtp,
   requestOtp,
   getUser,
+  getProfile,
+  updateProfile,
+  uploadProfilePicture,
 } from "./controller";
 
 // Import role management
@@ -44,4 +49,19 @@ router.patch(
 // Get user route (with authentication and role check)
 router.route("/:userId").get(protect, auth(Role.User), verifyUser, getUser);
 
-export default router; // Export router
+// Profile routes
+router
+  .route("/profile")
+  .get(protect, auth(Role.User), getProfile )
+  .put(protect, auth(Role.User), validator(updateProfileValidation), updateProfile);
+
+// Profile picture upload route
+router.post(
+  "/profile-picture",
+  protect,
+  auth(Role.User),
+  validator(profilePictureValidation),
+  uploadProfilePicture
+);
+
+export default router;
