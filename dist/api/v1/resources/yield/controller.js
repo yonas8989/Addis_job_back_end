@@ -26,10 +26,15 @@ const createYieldPrediction = (req, res, next) => __awaiter(void 0, void 0, void
         const userId = req.user.id;
         // Call Flask API to get predicted yield
         const predictedYield = yield (0, yieldService_1.predictYield)({
-            humidity: data.weatherConditions.humidity,
-            temperatureMax: data.weatherConditions.temperatureMax,
-            temperatureMin: data.weatherConditions.temperatureMin,
-            windSpeed: data.weatherConditions.windSpeed,
+            NAME: data.name,
+            ELEVATION: data.elevation,
+            Year: data.year,
+            PRECIP: data.precipitation,
+            RELHUM: data.relativeHumidity,
+            SUNHRS: data.sunshineHours,
+            TMPMIN: data.temperatureMin,
+            TMPMAX: data.temperatureMax,
+            WINDLY: data.windSpeed,
         });
         // Create yield prediction in database
         const prediction = yield dal_1.YieldDal.createYieldPrediction(Object.assign(Object.assign({}, data), { userId,

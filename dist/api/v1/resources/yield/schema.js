@@ -8,41 +8,49 @@ exports.yieldSchema = new mongoose_1.Schema({
         required: [true, "User ID is required."],
         index: true,
     },
-    cropType: {
+    name: {
         type: String,
-        required: [true, "Crop type is required."],
-        maxlength: [50, "Crop type cannot exceed 50 characters."],
+        required: [true, "Location name is required."],
+        maxlength: [100, "Location name cannot exceed 100 characters."],
     },
-    fieldSize: {
+    elevation: {
         type: Number,
-        required: [true, "Field size is required."],
-        min: [0.1, "Field size must be at least 0.1 hectares."],
+        required: [true, " elevation is required."],
+        min: [0, " elevation cannot be negative."],
     },
-    soilType: {
-        type: String,
-        required: [true, "Soil type is required."],
-        maxlength: [50, "Soil type cannot exceed 50 characters."],
+    year: {
+        type: Number,
+        required: [true, "Year is required."],
+        min: [1900, "Year must be at least 1900."],
     },
-    weatherConditions: {
-        temperatureMax: {
-            type: Number,
-            required: [true, "Maximum temperature is required."],
-        },
-        temperatureMin: {
-            type: Number,
-            required: [true, "Minimum temperature is required."],
-        },
-        humidity: {
-            type: Number,
-            required: [true, "Humidity is required."],
-            min: [0, "Humidity cannot be negative."],
-            max: [100, "Humidity cannot exceed 100%."],
-        },
-        windSpeed: {
-            type: Number,
-            required: [true, "Wind speed is required."],
-            min: [0, "Wind speed cannot be negative."],
-        },
+    precipitation: {
+        type: Number,
+        required: [true, "Precipitation is required."],
+        min: [0, "Precipitation cannot be negative."],
+    },
+    relativeHumidity: {
+        type: Number,
+        required: [true, "Relative humidity is required."],
+        min: [0, "Relative humidity cannot be negative."],
+        max: [100, "Relative humidity cannot exceed 100%."],
+    },
+    sunshineHours: {
+        type: Number,
+        required: [true, "Sunshine hours are required."],
+        min: [0, "Sunshine hours cannot be negative."],
+    },
+    temperatureMin: {
+        type: Number,
+        required: [true, "Minimum temperature is required."],
+    },
+    temperatureMax: {
+        type: Number,
+        required: [true, "Maximum temperature is required."],
+    },
+    windSpeed: {
+        type: Number,
+        required: [true, "Wind speed is required."],
+        min: [0, "Wind speed cannot be negative."],
     },
     predictedYield: {
         type: Number,

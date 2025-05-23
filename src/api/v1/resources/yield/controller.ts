@@ -15,10 +15,15 @@ export const createYieldPrediction: RequestHandler = async (req, res, next) => {
 
     // Call Flask API to get predicted yield
     const predictedYield = await predictYield({
-      humidity: data.weatherConditions.humidity,
-      temperatureMax: data.weatherConditions.temperatureMax,
-      temperatureMin: data.weatherConditions.temperatureMin,
-      windSpeed: data.weatherConditions.windSpeed,
+      NAME: data.name,
+      ELEVATION: data.elevation,
+      Year: data.year,
+      PRECIP: data.precipitation,
+      RELHUM: data.relativeHumidity,
+      SUNHRS: data.sunshineHours,
+      TMPMIN: data.temperatureMin,
+      TMPMAX: data.temperatureMax,
+      WINDLY: data.windSpeed,
     });
 
     // Create yield prediction in database

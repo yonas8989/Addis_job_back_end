@@ -1,45 +1,50 @@
 import Joi from "joi";
 
 export const yieldPredictionValidation = Joi.object({
-  cropType: Joi.string().max(50).required().messages({
-    "string.base": "Crop type should be a string",
-    "string.empty": "Crop type cannot be empty",
-    "string.max": "Crop type cannot exceed 50 characters",
-    "any.required": "Crop type is required",
+  name: Joi.string().max(100).required().messages({
+    "string.base": "Location name should be a string",
+    "string.empty": "Location name cannot be empty",
+    "string.max": "Location name cannot exceed 100 characters",
+    "any.required": "Location name is required",
   }),
-  fieldSize: Joi.number().min(0.1).required().messages({
-    "number.base": "Field size should be a number",
-    "number.min": "Field size must be at least 0.1 hectares",
-    "any.required": "Field size is required",
+  elevation: Joi.number().min(0).required().messages({
+    "number.base": " elevation should be a number",
+    "number.min": " elevation cannot be negative",
+    "any.required": " elevation is required",
   }),
-  soilType: Joi.string().max(50).required().messages({
-    "string.base": "Soil type should be a string",
-    "string.empty": "Soil type cannot be empty",
-    "string.max": "Soil type cannot exceed 50 characters",
-    "any.required": "Soil type is required",
+  year: Joi.number().min(1900).required().messages({
+    "number.base": "Year should be a number",
+    "number.min": "Year must be at least 1900",
+    "any.required": "Year is required",
   }),
-  weatherConditions: Joi.object({
-    temperatureMax: Joi.number().required().messages({
-      "number.base": "Maximum temperature should be a number",
-      "any.required": "Maximum temperature is required",
-    }),
-    temperatureMin: Joi.number().required().messages({
-      "number.base": "Minimum temperature should be a number",
-      "any.required": "Minimum temperature is required",
-    }),
-    humidity: Joi.number().min(0).max(100).required().messages({
-      "number.base": "Humidity should be a number",
-      "number.min": "Humidity cannot be negative",
-      "number.max": "Humidity cannot exceed 100%",
-      "any.required": "Humidity is required",
-    }),
-    windSpeed: Joi.number().min(0).required().messages({
-      "number.base": "Wind speed should be a number",
-      "number.min": "Wind speed cannot be negative",
-      "any.required": "Wind speed is required",
-    }),
-  }).required().messages({
-    "any.required": "Weather conditions are required",
+  precipitation: Joi.number().min(0).required().messages({
+    "number.base": "Precipitation should be a number",
+    "number.min": "Precipitation cannot be negative",
+    "any.required": "Precipitation is required",
+  }),
+  relativeHumidity: Joi.number().min(0).max(100).required().messages({
+    "number.base": "Relative humidity should be a number",
+    "number.min": "Relative humidity cannot be negative",
+    "number.max": "Relative humidity cannot exceed 100%",
+    "any.required": "Relative humidity is required",
+  }),
+  sunshineHours: Joi.number().min(0).required().messages({
+    "number.base": "Sunshine hours should be a number",
+    "number.min": "Sunshine hours cannot be negative",
+    "any.required": "Sunshine hours are required",
+  }),
+  temperatureMin: Joi.number().required().messages({
+    "number.base": "Minimum temperature should be a number",
+    "any.required": "Minimum temperature is required",
+  }),
+  temperatureMax: Joi.number().required().messages({
+    "number.base": "Maximum temperature should be a number",
+    "any.required": "Maximum temperature is required",
+  }),
+  windSpeed: Joi.number().min(0).required().messages({
+    "number.base": "Wind speed should be a number",
+    "number.min": "Wind speed cannot be negative",
+    "any.required": "Wind speed is required",
   }),
   predictedYield: Joi.number().min(0).optional().messages({
     "number.base": "Predicted yield should be a number",

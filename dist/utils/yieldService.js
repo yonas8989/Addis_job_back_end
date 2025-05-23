@@ -16,25 +16,36 @@ exports.predictYield = void 0;
 const axios_1 = __importDefault(require("axios"));
 const app_error_1 = __importDefault(require("../utils/app_error"));
 const config_1 = __importDefault(require("../config"));
-const predictYield = (weatherData) => __awaiter(void 0, void 0, void 0, function* () {
+const predictYield = (data) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
     try {
-        const response = yield axios_1.default.post(`${config_1.default.flask_api_url}/predict`, weatherData, {
+        const response = yield axios_1.default.post("http://localhost:5001/predict", {
+            NAME: data.NAME,
+            ELEVATION: data.ELEVATION,
+            Year: data.Year,
+            PRECIP: data.PRECIP,
+            RELHUM: data.RELHUM,
+            SUNHRS: data.SUNHRS,
+            TMPMIN: data.TMPMIN,
+            TMPMAX: data.TMPMAX,
+            WINDLY: data.WINDLY,
+        }, {
             headers: {
                 "Content-Type": "application/json",
                 "x-api-key": config_1.default.api_key, // Authentication for Flask API
             },
         });
-        // Normalize status to handle both "success" (mock) and "SUCCESS" (potential Flask API)
+        // Normalize status to handle "success"
         const status = (_a = response.data.status) === null || _a === void 0 ? void 0 : _a.toLowerCase();
         if (!status || status !== "success") {
             throw new app_error_1.default(`Prediction failed: ${response.data.error || "Unknown error"}`, 400);
         }
         // Validate prediction value
-        if (typeof response.data.prediction !== "number" || isNaN(response.data.prediction)) {
+        if (typeof response.data.predicted_yield !== "number" ||
+            isNaN(response.data.predicted_yield)) {
             throw new app_error_1.default("Invalid prediction value received", 400);
         }
-        return response.data.prediction;
+        return response.data.predicted_yield;
     }
     catch (error) {
         if (axios_1.default.isAxiosError(error)) {

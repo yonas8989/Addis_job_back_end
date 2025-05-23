@@ -23,7 +23,7 @@ router.route("/:userId").get(middleware_1.protect, (0, middleware_1.auth)(shared
 // Profile routes
 router
     .route("/profile")
-    .get(middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), controller_1.getProfile, middleware_1.verifyUser)
+    .get(middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), controller_1.getProfile)
     .put(middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), (0, middleware_1.validator)(validations_1.updateProfileValidation), controller_1.updateProfile);
 // Profile picture upload route
 router.post("/profile-picture", middleware_1.protect, (0, middleware_1.auth)(shared_1.Role.User), (0, middleware_1.validator)(validations_1.profilePictureValidation), controller_1.uploadProfilePicture);
