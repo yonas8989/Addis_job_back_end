@@ -34,10 +34,6 @@ export const createUserValidation = Joi.object({
     "string.min": "Password can not be less than 8 characters",
     "any.required": "Password is required",
   }),
-  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
-    "any.required": "Password confirm is required",
-    "any.only": "Passwords do not match",
-  }),
 });
 
 export const userLoginValidation = Joi.object({
