@@ -7,20 +7,13 @@ export interface IUserDocument extends Document {
   phoneNumber: string;
   password: string;
   role: string;
+  isActive: boolean;
   isEmailOrPhoneNumberChanged: boolean;
   isPasswordChanged: boolean;
-  isVerified: boolean;
-  isActive: boolean;
-  otp: string;
-  otpExpiresIn: Date;
-  passwordResetToken: string;
-  passwordResetTokenExpiresIn: string;
-  lastActivityDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// User schema definition
 export const userSchema = new Schema(
   {
     firstName: {
@@ -38,49 +31,40 @@ export const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "Email is required."],
-      unique: true, // Email must be unique
+      unique: true,
     },
     phoneNumber: {
       type: String,
       required: [true, "Phone number is required."],
-      unique: true, // Phone number must be unique
+      unique: true,
     },
     role: {
       type: String,
-      default: "User", // Default role is "User"
+      default: "User",
     },
     password: {
       type: String,
       required: [true, "Password is required."],
-      select: false, // Don't include the password field by default in queries
-    },
-    isEmailOrPhoneNumberChanged: {
-      type: Boolean,
-      default: false, // Flag for whether email/phone number has been changed
-    },
-    isPasswordChanged: {
-      type: Boolean,
-      default: false, // Flag for whether the password has been changed
-    },
-    isVerified: {
-      type: Boolean,
-      default: false, // Default is unverified user
+      select: false,
     },
     isActive: {
       type: Boolean,
-      default: true, // Default is active user
+      default: true,
     },
-    otp: String, // OTP for user verification
-    otpExpiresIn: Date, // OTP expiration date
-    passwordResetToken: String, // Token for password reset
-    passwordResetTokenExpiresIn: Date, // Expiration date for the reset token
-    lastActivityDate: Date, // Timestamp for last activity
+    isEmailOrPhoneNumberChanged: {
+      type: Boolean,
+      default: false,
+    },
+    isPasswordChanged: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     writeConcern: {
-      w: "majority", // Ensures writes are acknowledged by a majority of nodes
-      j: true, // Journal writes to ensure durability
+      w: "majority",
+      j: true,
     },
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );

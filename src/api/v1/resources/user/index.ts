@@ -1,47 +1,16 @@
-import { Router } from "express"; // Import Router
-const router = Router(); // Initialize router
+import { Router } from "express";
+const router = Router();
 
-// Import middleware functions
 import { validator, protect, auth, verifyUser } from "../middleware";
-
-// Import validation schemas
-import {
-  createUserValidation,
-  userLoginValidation,
-  verifyOtpValidation,
-} from "./validations";
-
-// Import controller functions
-import {
-  createUser,
-  userLogin,
-  verifyOtp,
-  requestOtp,
-  getUser,
-} from "./controller";
-
-// Import role management
+import { createUserValidation, userLoginValidation } from "./validations";
+import { createUser, userLogin, getUser } from "./controller";
 import { Role } from "../../../../shared";
 
-// User login route
+// User authentication routes
 router.post("/login", validator(userLoginValidation), userLogin);
+router.post("/", validator(createUserValidation), createUser);
 
-// Create user route
-router.route("/").post(validator(createUserValidation), createUser);
+// Protected user routes
+router.get("/:userId", protect, auth(Role.User), verifyUser, getUser);
 
-// OTP verification route
-router.patch("/:userId/verifyotp", validator(verifyOtpValidation), verifyOtp);
-
-// Request OTP route (with authentication and role check)
-router.patch(
-  "/:userId/requestotp",
-  protect,
-  auth(Role.User),
-  verifyUser,
-  requestOtp
-);
-
-// Get user route (with authentication and role check)
-router.route("/:userId").get(protect, auth(Role.User), verifyUser, getUser);
-
-export default router; // Export router
+export default router;

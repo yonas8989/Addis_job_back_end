@@ -68,13 +68,3 @@ export const userLoginValidation = Joi.object({
     "any.required": "Password is required",
   }),
 });
-
-export const verifyOtpValidation = Joi.object({
-  otp: Joi.string().max(4).min(4).required().messages({
-    "string.base": "OTP should be a string",
-    "string.empty": "OTP can not be empty",
-    "string.max": "OTP can not exceed 4 characters",
-    "string.min": "OTP can not be less than 4 characters",
-    "any.required": "OTP is required",
-  }),
-});

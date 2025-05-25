@@ -6,10 +6,6 @@ export interface ICreateUser {
   password: string;
 }
 
-export interface IVerifyOtp {
-  otp: string;
-}
-
 export interface IUserLogin {
   emailOrPhoneNumber: string;
   password: string;
