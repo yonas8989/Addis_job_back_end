@@ -25,10 +25,10 @@ export default {
     secret: <string>process.env.JWT_SECRET,
   },
   // Add these new configurations
-  frontend_url: <string>process.env.FRONTEND_URL || "http://localhost:5173",
+  frontend_url: <string>process.env.FRONTEND_URL || "http://localhost:3001",
   cors: {
     allowedOrigins: [
-      <string>process.env.FRONTEND_URL || "http://localhost:5173",
+      <string>process.env.FRONTEND_URL || "http://localhost:3001",
       // Add other allowed origins if needed
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
