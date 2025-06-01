@@ -92,3 +92,17 @@ export const getUserSongs: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const getSongStatistics: RequestHandler = async (req, res, next) => {
+  try {
+    const stats = await SongDal.getSongStatistics();
+    
+    res.status(200).json({
+      status: "SUCCESS",
+      data: { stats },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

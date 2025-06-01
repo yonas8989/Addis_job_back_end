@@ -2,7 +2,7 @@ import { Router } from "express";
 const router = Router();
 
 import { validator, protect, auth } from "../middleware";
-import { createSongValidation, updateSongValidation} from "./validation";
+import { createSongValidation, updateSongValidation } from "./validation";
 import {
   createSong,
   getSong,
@@ -10,6 +10,7 @@ import {
   updateSong,
   deleteSong,
   getUserSongs,
+  getSongStatistics,
 } from "./controller";
 import { Role } from "../../../../shared";
 
@@ -18,6 +19,9 @@ router.use(protect);
 
 // Public routes (no auth required)
 router.get("/", getAllSongs);
+// Statistics route should come before parameterized routes
+router.get("/stats", getSongStatistics);
+// Parameterized routes come after specific routes
 router.get("/:songId", getSong);
 
 // User routes
