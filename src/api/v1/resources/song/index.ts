@@ -14,8 +14,7 @@ import {
 } from "./controller";
 import { Role } from "../../../../shared";
 
-// Apply protect middleware to all song routes
-router.use(protect);
+
 
 // Public routes (no auth required)
 router.get("/", getAllSongs);
@@ -23,6 +22,9 @@ router.get("/", getAllSongs);
 router.get("/stats", getSongStatistics);
 // Parameterized routes come after specific routes
 router.get("/:songId", getSong);
+
+// Apply protect middleware to all song routes
+router.use(protect);
 
 // User routes
 router.post("/", auth(Role.User), validator(createSongValidation), createSong);
