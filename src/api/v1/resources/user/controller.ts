@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { ICreateUser, IUserLogin } from "./dto";
-import { hashPayload } from "../../../../utils/hashPayload";
+import { hashPayload } from "../../../../utils/hashpayload";
 import { UserDal } from "./dal";
 import { compareSync } from "bcryptjs";
 import AppError from "../../../../utils/app_error";
