@@ -7,6 +7,10 @@ import db from "./db";
  * Handles server shutdown gracefully on SIGINT.
  */
 export default () => {
+  app.get("/", (req, res) => {
+    res.send("✅ Addis Job Backend is running!");
+  });
+
   const port = (process.env.PORT as unknown as number) || 3000;
 
   const server = createServer(app);
