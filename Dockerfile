@@ -35,7 +35,8 @@ COPY --from=builder /app/dist ./dist
 COPY .env ./
 
 # Expose the port
-EXPOSE 3000
+EXPOSE 8080
+
 
 # Command to run the application
 CMD ["node", "./dist/index.js"]
