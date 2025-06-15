@@ -15,8 +15,8 @@ exports.yieldSchema = new mongoose_1.Schema({
     },
     elevation: {
         type: Number,
-        required: [true, " elevation is required."],
-        min: [0, " elevation cannot be negative."],
+        required: [true, "Elevation is required."],
+        min: [0, "Elevation cannot be negative."],
     },
     year: {
         type: Number,
@@ -54,8 +54,8 @@ exports.yieldSchema = new mongoose_1.Schema({
     },
     predictedYield: {
         type: Number,
-        required: [true, "Predicted yield is required."],
         min: [0, "Predicted yield cannot be negative."],
+        required: false, // Changed to optional
     },
     predictionDate: {
         type: Date,

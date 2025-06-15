@@ -8,7 +8,7 @@ export class YieldDal {
     data: ICreateYieldPrediction & {
       userId: string;
       predictionDate: Date;
-      predictedYield: number; // Ensure predictedYield is required
+      predictedYield?: number; // Ensure predictedYield is required
     }
   ): Promise<IYieldDocument> {
     try {
